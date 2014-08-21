@@ -1,6 +1,6 @@
 define({
 	// style: "",
-	main   : "key_switch",
+	main   : "keyswitch",
 	module : [
 		"library/morphism",
 		"library/event_master",
