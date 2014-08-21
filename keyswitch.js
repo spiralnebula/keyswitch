@@ -4,7 +4,8 @@ define({
 		require : [
 			"morphism",
 			"event_master",
-			"transistor"
+			"transistor",
+			"shumput"
 		],
 		allow : "*"
 	},
@@ -39,15 +40,31 @@ define({
 		}
 	},
 
-	define_state : function ( define ) { 
-		return { 
+	define_state : function ( define ) {
+		var state
+		state = { 
 			value : define.with.option.value || define.with.option.choice[0]
 		}
+		if ( define.with.input ) { 
+			state.input = {
+				value : define.with.input.value || ""
+			}
+			if ( define.with.input.verify ) { 
+				state.input.verify = define.with.input.verify
+			}
+		}
+		return state
 	},
 
 	define_listener : function ( define ) {
 		var self = this
 		return [
+			// {
+			// 	for       : "keyswitch type",
+			// 	that_does : function ( heard ) {
+
+			// 	}
+			// },
 			{
 				for       : "keyswitch select",
 				that_does : function ( heard ) {
@@ -73,6 +90,9 @@ define({
 
 	define_event : function ( define ) {
 		return [
+			{ 
+
+			},
 			{
 				called       : "keyswitch select",
 				that_happens : [
@@ -86,37 +106,47 @@ define({
 						heard.event.target.getAttribute("data-keyswitch") 
 					)
 				}
-			},
-			// {
-			// 	called       : "keyswitch_select",
-			// 	that_happens : [
-			// 		{
-			// 			on : define.body,
-			// 			is : [ "click" ]
-			// 		}
-			// 	],
-			// 	only_if : function ( heard ) {
-			// 		return ( heard.event.target.getAttribute("data-keyswitch-key") )
-			// 	}
-			// },
+			}
 		]
 	},
 
 	define_body : function ( define ) {
-		var self = this
+		var default_value, self
+		self          = this
+		default_value = define.with.option.value || define.with.option.choice[0]
 		return {
 			"class" : define.class_name.wrap,
-			"child" : this.library.morphism.index_loop({
-				array   : define.with.option.choice,
-				else_do : function ( loop ) {
-					return loop.into.concat({
-						"class"          : define.class_name.item,
-						"data-value"     : loop.indexed,
-						"data-keyswitch" : define.name,
-						"text"           : loop.indexed
+			"child" : [
+				{
+					"class" : define.class_name.item_wrap,
+					"child" : this.library.morphism.index_loop({
+						array   : define.with.option.choice,
+						else_do : function ( loop ) {
+							return loop.into.concat({
+								"class"          : ( default_value === loop.indexed ? 
+									define.class_name.item_selected :
+									define.class_name.item
+								),
+								"data-value"     : loop.indexed,
+								"data-keyswitch" : define.name,
+								"text"           : loop.indexed
+							})
+						}
 					})
 				}
-			})
+			].concat( define.with.input ?
+				{
+					"class" : define.class_name.input_wrap,
+					"child" : [
+						self.library.shumput.define_body({
+							class_name  : define.class_name.input,
+							with        : define.with.input,
+							option_name : "keyswitch-shumput"
+						})
+					]
+				} : 
+				[]
+			)
 		}
 	},
 
@@ -136,27 +166,5 @@ define({
 			}
 		}
 		return state
-	},
-
-	convert_text_to_option_name : function ( text ) { 
-		return text.replace(/\s/g, "_").toLowerCase()
-	},
-
-	get_the_node_with_the_given_value : function ( given ) {
-		return this.library.morphism.index_loop_base({
-			array    : given.nodes,
-			start_at : 0,
-			into     : {},
-			if_done  : function ( loop ) {
-				return loop.into
-			},
-			else_do  : function ( loop ) {
-				if ( loop.array[loop.start_at].getAttribute("data-value") === given.value ) {
-					loop.into = loop.array[loop.start_at]
-				}
-				loop.start_at += 1
-				return loop
-			}
-		})
 	}
 })
