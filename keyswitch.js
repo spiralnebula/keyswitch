@@ -1,13 +1,13 @@
 define({
 	
 	define : {
+		allow   : "*",
 		require : [
 			"morphism",
 			"event_master",
 			"transistor",
 			"shumput"
 		],
-		allow : "*"
 	},
 
 	make : function ( define ) {
