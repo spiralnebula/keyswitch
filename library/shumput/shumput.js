@@ -37,34 +37,51 @@ define({
 	},
 
 	define_listener : function ( define ) {
+		var self = this
 		return [ 
 			{
 				for       : "shumput input type",
 				that_does : function ( heard ) {
-					var value, option_state
-					option_state       = heard.state.option[heard.event.target.getAttribute("data-shumput")]
-					value              = heard.event.target.value
-					option_state.value = value
-					if ( option_state.verify.when ) {
-						var verification, text_body
-						text_body = heard.event.target.nextSibling
-						if ( option_state.verify.when( value ) ) {
-							verification            = option_state.verify.with( value )
-							option_state.valid      = verification.is_valid
-							text_body.textContent   = verification.text
-							text_body.style.display = "block"
-						} else { 
-							text_body.style.display = "none"
-						}
-					}
-					return heard
+					return self.input_type_listener({
+						data_name  : "data-shumput",
+						class_name : define.class_name,
+						state      : heard.state,
+						event      : heard.event,
+					})
 				}
 			}
 		]
 	},
 
+	input_type_listener : function ( input ) {
+		var value, option_state
+		option_state       = input.state.option[input.event.target.getAttribute( input.data_name )]
+		value              = input.event.target.value
+		option_state.value = value
+		if ( option_state.verify.when ) {
+			var verification, text_body
+			text_body = input.event.target.nextSibling
+			if ( option_state.verify.when( value ) ) {
+				verification            = option_state.verify.with( value )
+				option_state.valid      = verification.is_valid
+				text_body.textContent   = verification.text
+				text_body.style.display = "block"
+				if ( option_state.valid ) { 
+					text_body.setAttribute("class", input.class_name.text_valid )
+				} else { 
+					text_body.setAttribute("class", input.class_name.text_invalid )
+				}
+			} else {
+				text_body.style.display = "none"
+			}
+		}
+		return { 
+			state : input.state,
+			event : input.event
+		}
+	},
+
 	define_body : function ( define ) {
-		console.log(define.with)
 		return {
 			"class" : define.class_name.wrap,
 			"child" : [
