@@ -1,4 +1,19 @@
-Key Switch UI Package
-=====================
+Key Switch
+==========
 
-A nebula package for creating mupltiple option choices yo
+*Replaces you radio buttons.*
+
+ - Allows input fields to popup on specified options.
+
+```javacript
+keyswtich.make({
+    class_name : {}
+    with       : {
+        option : {
+            choice        : Array,
+            default_value : String
+        },
+        input : Object
+    }
+})
+```
