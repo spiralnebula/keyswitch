@@ -5,7 +5,7 @@ Key Switch
 
  - Allows input fields to popup on specified options.
 
-```javacript
+```javascript
 keyswtich.make({
     class_name : {}
     with       : {
