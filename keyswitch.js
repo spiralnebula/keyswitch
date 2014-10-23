@@ -49,7 +49,7 @@ define({
 		return this.define_interface({
 			body              : keyswitch_body,
 			event_master      : event_circle,
-			get_shumput_state : ( shumput_part ? shumput_part.get_state : false )
+			shumput           : shumput_part || false
 		})
 	},
 
@@ -59,13 +59,16 @@ define({
 				if ( define.get_shumput_state !== false ) {
 					return { 
 						option : define.event_master.get_state(),
-						input  : define.get_shumput_state()
+						input  : define.shumput.get_state()
 					}
 				} else { 
 					return define.event_master.get_state()
 				}
 			},
-			reset     : function () { 
+			reset     : function () {
+				if ( define.shumput ) { 
+					define.shumput.reset()
+				}
 				define.event_master.stage_event({
 					called : "reset",
 					as     : function ( state ) { 
@@ -151,6 +154,18 @@ define({
 						heard.state.value = heard.state.original_value
 						button.selected.setAttribute("class", define.class_name.item )
 						button.default_value.setAttribute("class", define.class_name.item_selected )
+					}
+
+					if ( define.with.input ) {
+						
+						var input_node
+						input_node = wrap_node.lastChild
+
+						if ( define.with.input.show_on === heard.state.original_value ) {
+							input_node.style.display = "block"
+						} else { 
+							input_node.style.display = "none"
+						}
 					}
 
 					return heard
