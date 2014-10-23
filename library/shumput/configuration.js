@@ -1,8 +1,11 @@
 define({
 	name    : "shumput",
 	main    : "shumput",
-	module  : [],
+	module  : [
+		"library/event_master"
+	],
 	package : [
-		"library/morph"
+		"library/morph",
+		"library/transistor"
 	]
 })

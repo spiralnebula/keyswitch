@@ -12,11 +12,28 @@ define({
 
 	make : function ( define ) {
 
-		var keyswitch_body, event_circle
+		var keyswitch_body, event_circle, shumput_part, default_value
 
+		default_value  = define.with.option.value || define.with.option.choice[0]
 		keyswitch_body = this.library.transistor.make(
 			this.define_body(define)
 		)
+		
+		if ( define.with.input ) {
+
+			shumput_part = this.library.shumput.make({
+				class_name : define.class_name.input,
+				with       : define.with.input.with
+			})
+
+			if ( define.with.input.show_on === default_value ) {
+				shumput_part.body.style.display = "block"
+			} else {
+				shumput_part.body.style.display = "none"
+			}
+			shumput_part.append( keyswitch_body.body )
+			
+		}
 		event_circle   = this.library.event_master.make({
 			events : this.define_event({
 				body : keyswitch_body,
@@ -30,15 +47,23 @@ define({
 		)
 
 		return this.define_interface({
-			body         : keyswitch_body,
-			event_master : event_circle
+			body              : keyswitch_body,
+			event_master      : event_circle,
+			get_shumput_state : ( shumput_part ? shumput_part.get_state : false )
 		})
 	},
 
 	define_interface : function ( define ) {
 		return {
 			get_state : function () {
-				return define.event_master.get_state()
+				if ( define.get_shumput_state !== false ) {
+					return { 
+						option : define.event_master.get_state(),
+						input  : define.get_shumput_state()
+					}
+				} else { 
+					return define.event_master.get_state()
+				}
 			},
 			reset     : function () { 
 				define.event_master.stage_event({
@@ -60,7 +85,12 @@ define({
 
 	define_state : function ( define ) {
 		var default_value = define.with.option.value || define.with.option.choice[0]
-		return state = { 
+		return { 
+			show_on        : ( 
+				define.with.input ? 
+					define.with.input.show_on : 
+					false
+			),
 			original_value : default_value,
 			value          : default_value
 		}
@@ -138,7 +168,8 @@ define({
 					value              = button.getAttribute("data-value")
 					option_state.value = value
 					button.setAttribute("class", define.class_name.item_selected )
-					self.library.morph.index_loop({
+					
+					 self.library.morph.index_loop({
 						subject : button.parentElement.children,
 						else_do : function ( loop ) {
 							if ( loop.indexed !== button ) { 
@@ -147,6 +178,22 @@ define({
 							return []
 						}
 					})
+
+					if ( define.with.input ) { 
+						
+						var input_wrap_node
+						input_wrap_node = wrap.nextSibling
+
+						if ( button.getAttribute("data-value") === define.with.input.show_on ) {
+
+							input_wrap_node.style.display = "block"
+
+							console.log( input_wrap_node )
+						} else { 
+							input_wrap_node.style.display = "none"
+						}
+					}
+
 					return heard
 				}
 			}
@@ -173,7 +220,7 @@ define({
 									define.class_name.item
 								),
 								"data-value"     : loop.indexed,
-								"data-keyswitch" : define.name,
+								"data-keyswitch" : "true",
 								"text"           : loop.indexed
 							})
 						}
