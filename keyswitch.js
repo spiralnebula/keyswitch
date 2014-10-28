@@ -10,6 +10,17 @@ define({
 		],
 	},
 
+	// this.remake({
+	// 	original : Object,
+	// 	with     : {
+	// 		listener : {
+	// 			"0" : {
+	// 				with : Object
+	// 			}
+	// 		}
+	// 	}
+	// })
+
 	make : function ( define ) {
 
 		var keyswitch_body, event_circle, shumput_part, default_value
@@ -43,13 +54,18 @@ define({
 		})
 
 		event_circle.add_listener(
-			this.define_listener( define )
+			this.define_listener({
+				class_name : define.class_name,
+				with       : define.with,
+				given      : define.given || {},
+				shumput    : shumput_part
+			})
 		)
 
 		return this.define_interface({
 			body              : keyswitch_body,
 			event_master      : event_circle,
-			shumput           : shumput_part || false
+			get_shumput_state : ( shumput_part ? shumput_part.get_state : false )
 		})
 	},
 
@@ -59,7 +75,7 @@ define({
 				if ( define.get_shumput_state !== false ) {
 					return { 
 						option : define.event_master.get_state(),
-						input  : define.shumput.get_state()
+						input  : define.get_shumput_state()
 					}
 				} else { 
 					return define.event_master.get_state()
@@ -120,6 +136,7 @@ define({
 	},
 
 	define_listener : function ( define ) {
+		console.log( define )
 		var self = this
 		return [
 			{ 
@@ -138,7 +155,6 @@ define({
 						},
 						else_do : function ( loop ) {
 							if ( loop.indexed.getAttribute("data-value") === heard.state.value ) {
-								console.log("the same yo")
 								loop.into.selected = loop.indexed
 							} 
 
@@ -167,6 +183,8 @@ define({
 							input_node.style.display = "none"
 						}
 					}
+
+					define.shumput.reset()
 
 					return heard
 				}
