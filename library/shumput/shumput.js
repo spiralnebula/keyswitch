@@ -130,9 +130,9 @@ define({
 				that_does : function ( heard ) {
 
 					var input_node, option_state
-
-					input_node   = heard.event.target
-					option_state = heard.state
+					input_node         = heard.event.target
+					option_state       = heard.state
+					option_state.value = input_node.value
 
 					if ( option_state.verify && option_state.verify.when ) {
 
@@ -144,7 +144,6 @@ define({
 
 							verification            = option_state.verify.with( input_node.value )
 							option_state.valid      = verification.is_valid
-							option_state.value      = input_node.value
 							text_body.textContent   = verification.text
 							text_body.style.display = "block"
 

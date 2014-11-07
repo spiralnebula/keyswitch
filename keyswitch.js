@@ -136,7 +136,7 @@ define({
 	},
 
 	define_listener : function ( define ) {
-		console.log( define )
+		
 		var self = this
 		return [
 			{ 
@@ -183,8 +183,10 @@ define({
 							input_node.style.display = "none"
 						}
 					}
-
-					define.shumput.reset()
+					
+					if ( define.shumput ) { 
+						define.shumput.reset()
+					}
 
 					return heard
 				}
