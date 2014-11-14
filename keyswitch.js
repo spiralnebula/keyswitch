@@ -73,9 +73,17 @@ define({
 		return {
 			get_state : function () {
 				if ( define.get_shumput_state !== false ) {
+					var input_state, keyswitch_state
+					keyswitch_state = define.event_master.get_state()
+					input_state     = define.get_shumput_state()
 					return { 
-						option : define.event_master.get_state(),
-						input  : define.get_shumput_state()
+						option : input_state,
+						input  : keyswitch_state,
+						value  : ( 
+							keyswitch_state.value === keyswitch_state.show_on ?
+								input_state.value :
+								keyswitch_state.value
+						)
 					}
 				} else { 
 					return define.event_master.get_state()

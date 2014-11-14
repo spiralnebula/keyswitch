@@ -101,7 +101,7 @@ define({
 					option_state.value = option_state.original_value
 					input_node.value   = option_state.original_value
 					input_node.setAttribute("value", option_state.original_value )
-
+					
 					if ( option_state.verify && option_state.verify.when ) {
 
 						var verification, text_body
@@ -130,6 +130,7 @@ define({
 				that_does : function ( heard ) {
 
 					var input_node, option_state
+					
 					input_node         = heard.event.target
 					option_state       = heard.state
 					option_state.value = input_node.value
