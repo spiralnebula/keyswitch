@@ -28,109 +28,6 @@
 			})
 		})
 	})
-
-	describe("homomorph", function () {
-		
-		var input, expected_array, maped_array
-		
-		expected_array = [
-			"stuff",
-			123,
-			{
-				s : "stuff",
-				n : 123,
-				a : [1,2,3],
-				o : {
-					s : "stuff",
-					n : 123,
-					a : [1,2,3]
-				},
-			},
-			function (stuff) { return stuff },
-			[1,2,3]
-		]
-		input = {
-			s : "stuff",
-			n : 123,
-			o : {
-				s : "stuff",
-				n : 123,
-				a : [1,2,3],
-				o : {
-					s : "stuff",
-					n : 123,
-					a : [1,2,3]
-				},
-			},
-			f : function (stuff) { return stuff },
-			a : [1,2,3]
-		}
-		maped_array  = module.homomorph({ object : input, set : "array" })
-		maped_object = module.homomorph({ object : input })
-		
-
-		it("does not copy the prototype", function () {
-			var proto_test, output
-			proto_test    = Object.create(input)
-			proto_test.dd = "new"
-			output        = module.homomorph({
-				object : proto_test,
-				with   : function (member) {
-					return member.value
-				}
-			})
-			expect(output.s).toBe(undefined)
-			expect(output.dd).toBe("new")
-		})
-
-		it("has no references hidden in nested objects", function () {
-			var output = module.homomorph({
-				object : input,
-				with   : function (member) {
-					return member.value
-				}
-			})
-			output.s     = "stuff2"
-			output.n     = 1234
-			output.o.s   = "stuff3"
-			output.o.n   = 1234
-			output.o.a   = output.o.a.concat(4)
-			output.o.o.s = "stuff3"
-			output.o.o.n = 1234
-			output.o.o.a = output.o.o.a.concat(4)
-			output.a     = output.a.concat(4)
-
-			expect(input.s).not.toEqual(output.s)
-			expect(input.n).not.toEqual(output.n)
-			expect(input.a).not.toEqual(output.a)
-			expect(input.o.s).not.toEqual(output.o.s)
-			expect(input.o.n).not.toEqual(output.o.n)
-			expect(input.o.a).not.toEqual(output.o.a)
-			expect(input.o.o.s).not.toEqual(output.o.o.s)
-			expect(input.o.o.n).not.toEqual(output.o.o.n)
-			expect(input.o.o.a).not.toEqual(output.o.o.a)
-			expect(output.f("test")).toEqual("test")
-		})
-
-		it("maps without reference", function() {
-			expect( maped_object ).not.toBe( input )
-		})
-
-		it("maps to an array", function() {
-
-			// the function is not checked case it wont equal or somethign, its legit
-			expect( maped_array[0] ).toEqual( expected_array[0] )
-			expect( maped_array[1] ).toEqual( expected_array[1] )
-			expect( maped_array[2] ).toEqual( expected_array[2] )
-			expect( maped_array[4] ).toEqual( expected_array[4] )
-		})
-
-		it("maps to an array without any sneaky references", function() {
-
-			expect( maped_array[2] ).not.toBe( expected_array[2] )
-			expect( maped_array[4] ).not.toBe( expected_array[4] )
-		})
-	})
 	
 	describe("index loop", function () {
 		var input_1, input_2, input_3
@@ -312,6 +209,13 @@
 			})).toBe(true)
 		})
 
+		it("knows that two objects with one value are the same", function() {
+			expect( module.are_these_two_values_the_same({
+				first  : { some : "s" },
+				second : { some : "s" }
+			}) ).toBe(true)
+		});
+
 		it("knows that two objects are the same", function() {
 			expect( module.are_these_two_values_the_same({
 				first  : {
@@ -375,11 +279,20 @@
 					c : [1,23,4]
 				}
 			})).toBe(false)	
+		})
 
+		it("knows that two arrays are the same", function() {
+			expect( module.are_these_two_values_the_same({
+				first  : [1,2,4],
+				second : [1,2,4]
+			})).toBe(true)	
+		})
+
+		it("knows that two arrays are the same", function() {
 			expect( module.are_these_two_values_the_same({
 				first  : [1,2,4],
 				second : [1,4]
-			})).toBe(false)
+			})).toBe(false)	
 		})
 	})
 
@@ -535,6 +448,7 @@
 	})
 
 	describe("object loop", function() {
+
 		it("loops through an object with a simple else do", function() {
 			expect(module.object_loop({
 				subject : {
@@ -571,7 +485,7 @@
 			})).toEqual("02s:d04:12b:some14")
 		})
 
-		it("loops through an object with the into", function() {
+		it("loops through an object with the into string", function() {
 			expect(module.object_loop({
 				subject : {
 					s : "d",
@@ -586,6 +500,26 @@
 					}
 				}
 			})).toEqual("somess")
+		})
+
+		it("loops through an object that has empty values and dosent freak out", function() {
+			expect(module.object_loop({
+				subject : {
+					s : "",
+					d : "some",
+					c : "",
+				},
+				else_do : function ( loop ) { 
+					return {
+						key   : loop.key,
+						value : loop.value
+					}
+				}
+			})).toEqual({
+				s : "",
+				d : "some",
+				c : "",
+			})
 		})
 	})
 
@@ -646,3 +580,12 @@
 			})	
 		})
 	})
+
+	// describe("does array contain this value", function() {
+	// 	it("recoginses that it contains a object", function() {
+	// 		expect(module.does_array_contain_this_value({
+	// 			array : [{ some : "s" }, 2, 4, "some", { some : "d" }],
+	// 			value : { some : "s" }
+	// 		})).toBe( true )
+	// 	})
+	// });

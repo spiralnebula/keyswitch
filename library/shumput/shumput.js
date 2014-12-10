@@ -5,7 +5,8 @@ define({
 		require : [
 			"morph",
 			"transistor",
-			"event_master"
+			"event_master",
+			"suggest"
 		],
 	},
 
@@ -63,7 +64,8 @@ define({
 			value          : default_value,
 			original_value : default_value,
 			valid          : ( !define.with.verify ),
-			verify         : define.with.verify || {}
+			verify         : define.with.verify  || false,
+			suggest        : define.with.suggest || false
 		}
 	},
 
@@ -71,6 +73,18 @@ define({
 		return [
 			{ 
 				called : "reset"
+			},
+			{ 
+				called : "choose suggestion",
+				that_happens : [
+					{
+						on : define.body.body,
+						is : [ "click" ]
+					}
+				],
+				only_if      : function ( heard ) {
+					return heard.event.target.hasAttribute("data-shumput-choose-suggestion")
+				}
 			},
 			{ 
 				called       : "shumput input type",
@@ -125,15 +139,66 @@ define({
 					return heard
 				}
 			},
+			{ 
+				for       : "choose suggestion",
+				that_does : function ( heard ) {
+					
+					var input_body, input_container, option_state, new_value
+
+					if ( heard.event.target.parentElement.hasAttribute("data-shumput-choose-suggestion") ) {
+						input_body = heard.event.target.parentElement.parentElement.parentElement.firstChild
+					} else { 
+						input_body = heard.event.target.parentElement.parentElement.firstChild
+					}
+					input_container    = input_body.parentElement
+					option_state       = heard.state
+					new_value          = heard.event.target.getAttribute("data-shumput-choose-suggestion")
+					input_body.value   = new_value
+					option_state.value = new_value
+
+					input_container.removeChild( input_body.nextSibling )
+
+					return heard
+				}
+			},
 			{
 				for       : "shumput input type",
 				that_does : function ( heard ) {
 
-					var input_node, option_state
+					var input_node, option_state, input_container
+
 					input_node         = heard.event.target
+					input_container    = input_node.parentElement
 					option_state       = heard.state
 					option_state.value = input_node.value
-					if ( option_state.verify && option_state.verify.when ) {
+
+					if ( option_state.suggest ) {
+
+						if ( input_node.nextSibling !== null ) { 
+							input_container.removeChild( input_node.nextSibling )
+						}
+
+						if ( input_node.value ) { 
+							var matching_word_definition, suggested_body
+
+							matching_word_definition = self.library.suggest.get_the_closest_matching_word_from_an_array({
+								array         : option_state.suggest.list,
+								searched_text : input_node.value
+							})
+
+							if ( matching_word_definition.length > 0 ) {
+								suggested_body = self.library.transistor.make(
+									self.define_suggest_list({
+										class_name : define.class_name,
+										list       : matching_word_definition
+									})
+								)
+								suggested_body.append( input_container )
+							}
+						}
+					}
+
+					if ( option_state.verify  ) {
 
 						var verification, text_body
 
@@ -162,6 +227,38 @@ define({
 				}
 			}
 		]
+	},
+
+	define_suggest_list : function ( define ) { 
+		return {
+			"class" : define.class_name.suggest_container,
+			"child" : this.library.morph.index_loop({
+				subject : define.list,
+				else_do : function ( loop ) {
+					return loop.into.concat({
+						"class"                          : define.class_name.suggest,
+						"data-shumput-choose-suggestion" : loop.indexed.matching.word,
+						"child" : [
+							{ 
+								"class"                          : define.class_name.suggest_text,
+								"text"                           : loop.indexed.matching.leftover.before,
+								"data-shumput-choose-suggestion" : loop.indexed.matching.word,
+							},
+							{ 
+								"class"                          : define.class_name.suggest_text_match,
+								"text"                           : loop.indexed.matching.text,
+								"data-shumput-choose-suggestion" : loop.indexed.matching.word,
+							},
+							{ 
+								"class"                          : define.class_name.suggest_text,
+								"text"                           : loop.indexed.matching.leftover.after,
+								"data-shumput-choose-suggestion" : loop.indexed.matching.word,
+							}
+						]
+					})
+				}
+			})
+		}
 	},
 
 	define_body : function ( define ) {

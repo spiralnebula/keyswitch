@@ -8,7 +8,6 @@ define({
 	},
 
 	make : function (circle) {
-
 		var event_circle, self
 
 		self         = this

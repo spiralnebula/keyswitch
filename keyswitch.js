@@ -89,7 +89,7 @@ define({
 					return define.event_master.get_state()
 				}
 			},
-			reset     : function () {
+			reset : function () {
 				if ( define.shumput ) { 
 					define.shumput.reset()
 				}
@@ -105,8 +105,10 @@ define({
 					}
 				})
 			},
-			body      : define.body.body,
-			append    : define.body.append,
+			body   : define.body.body,
+			append : function ( to_what ) {
+				define.body.append( to_what )
+			},
 		}
 	},
 

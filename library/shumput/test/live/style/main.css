@@ -1,0 +1,342 @@
+*, :before, :after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+body {
+  width: 100%;
+  float: left;
+  margin: 0;
+  padding: 20px;
+  font-family: Arial;
+  font-size: 14px;
+  line-height: 20px;
+  color: #333;
+  background-color: #404040;
+  color: #fff; }
+
+.wrap_list {
+  width: 300px;
+  float: left;
+  padding: 0px 10px;
+  margin-bottom: 10px; }
+
+.wrap_list_item {
+  width: 100%;
+  float: left;
+  padding: 10px; }
+
+.list_item_text_wrap {
+  float: left;
+  display: inline-block; }
+
+.list_item_notation {
+  float: left;
+  display: inline-block;
+  width: 20px; }
+
+.list_item_text {
+  float: left;
+  display: inline-block; }
+
+.list_item_list {
+  float: left;
+  width: 100%; }
+
+.wrap_text {
+  width: 100%;
+  float: left;
+  margin-bottom: 10px; }
+
+.regular_text {
+  text-transform: uppercase; }
+
+.imporant_text {
+  color: #23ff44; }
+
+.italic_text {
+  font-style: italic; }
+
+.title {
+  width: 100%;
+  float: left;
+  color: #5CB6FA;
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 18px;
+  padding: 20px 0 0; }
+
+.wrap_input {
+  width: 100%;
+  float: left;
+  margin-bottom: 10px; }
+
+.input_base, .input_small, .input_large {
+  font-family: Arial;
+  font-size: 14px;
+  line-height: 18px;
+  width: 300px;
+  padding: 10px;
+  border: 1px solid #444;
+  color: #fff;
+  background-color: #444;
+  float: left; }
+
+.input_text_base, .input_text_valid, .input_text_invalid {
+  width: 300px;
+  float: left;
+  margin-top: 10px;
+  clear: both;
+  text-transform: uppercase;
+  font-weight: bold; }
+
+.input_text_invalid {
+  font-style: italic; }
+
+.dropdown_main {
+  width: 300px;
+  float: left;
+  margin: 10px 0;
+  clear: both; }
+
+.option_selected_wrap {
+  width: 100%;
+  float: left;
+  background-color: #333;
+  color: #fff; }
+
+.option_selected {
+  display: inline-block;
+  float: left;
+  width: 80%;
+  padding: 10px; }
+
+.option_base, .option_selector, .option {
+  float: left;
+  padding: 10px;
+  color: #fff;
+  background-color: #555; }
+  .option_base:hover, .option_selector:hover, .option:hover {
+    background-color: #444; }
+
+.option_selector {
+  display: inline-block;
+  width: 20%;
+  text-align: center;
+  font-weight: bold; }
+
+.option_wrap {
+  float: left;
+  width: 100%; }
+
+.option {
+  width: 100%; }
+
+.radio_wrap {
+  float: left;
+  clear: both;
+  color: #fff;
+  margin: 10px 0px; }
+
+.radio_base, .radio_item, .radio_item_selected {
+  width: 100px;
+  padding: 10px;
+  float: left;
+  display: inline-block;
+  cursor: pointer;
+  background-color: #333;
+  color: #fff; }
+
+.radio_item {
+  background-color: #333; }
+
+.radio_item_selected {
+  background-color: #555; }
+
+.tree_wrap {
+  width: 100%;
+  float: left; }
+
+.tree_tree_wrap {
+  width: 100%;
+  float: left;
+  margin-bottom: 10px; }
+
+.tree_branch_text_badge {
+  display: inline-block;
+  float: left;
+  font-weight: bold;
+  margin-right: 10px;
+  padding: 10px;
+  width: 40px;
+  text-align: center;
+  background-color: #333;
+  cursor: pointer; }
+
+.tree_branch_text {
+  display: inline-block;
+  float: left;
+  padding: 10px;
+  background-color: #555;
+  cursor: pointer; }
+
+.tree_branch {
+  float: left;
+  width: 100%;
+  margin-top: 10px; }
+
+.tree_branch_children {
+  display: block;
+  float: left;
+  clear: both;
+  margin-left: 50px; }
+
+.tree_branch_text_wrap {
+  float: left;
+  width: 100%; }
+
+.tree_branch_text_wrap_active {
+  float: left;
+  width: 100%; }
+
+.tree_branch_text_option_wrap_active {
+  display: inline-block;
+  float: left; }
+
+.tree_branch_text_option, .tree_branch_text_option_active {
+  display: inline-block;
+  float: left;
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  background-color: #333; }
+
+.tree_branch_text_option_active {
+  background-color: #5CB6FA; }
+
+.tree_branch_text_option_button_wrap {
+  margin-left: 10px;
+  display: inline-block;
+  float: left; }
+
+.tree_result_wrap {
+  width: 100%;
+  float: left; }
+
+.tree_result_path_wrap {
+  width: 100%;
+  float: left;
+  margin-bottom: 10px;
+  background-color: #333;
+  padding: 10px; }
+
+.tree_result_text {
+  font-weight: bold;
+  display: inline-block;
+  float: left;
+  margin-right: 10px; }
+
+.tree_result_choice {
+  display: inline-block;
+  float: left;
+  margin-right: 10px; }
+
+.tree_result_path {
+  display: inline-block;
+  float: left; }
+
+.tree_result_button_wrap {
+  width: 100%;
+  float: left; }
+
+.tree_result_button {
+  float: left;
+  font-weight: bold;
+  padding: 10px;
+  background-color: #555;
+  cursor: pointer; }
+  .tree_result_button:hover {
+    background-color: #333; }
+
+.calendar_wrap {
+  width: 100%;
+  float: left;
+  margin-bottom: 20px; }
+
+.calendar_set_button {
+  width: 100px;
+  padding: 10px;
+  float: left;
+  display: inline-block;
+  cursor: pointer;
+  background-color: #555;
+  color: #fff; }
+  .calendar_set_button:hover {
+    background-color: #333; }
+
+.calendar_set_wrap {
+  width: 100%;
+  float: left; }
+
+.calendar_set_date {
+  display: inline-block;
+  float: left;
+  padding: 10px; }
+
+.calendar_calendar {
+  width: 30%;
+  float: left;
+  padding: 20px;
+  background-color: #333; }
+
+.calendar_calendar_part {
+  width: 100%;
+  float: left;
+  margin-bottom: 10px; }
+
+.calendar_date_month_wrap {
+  width: 100%;
+  float: left;
+  text-align: center; }
+
+.calendar_date_month_text, .calendar_date_current_month_text {
+  display: inline-block;
+  padding: 0 10px;
+  cursor: pointer; }
+  .calendar_date_month_text:hover, .calendar_date_current_month_text:hover {
+    text-decoration: underline; }
+
+.calendar_date_current_month_text {
+  font-weight: bold; }
+
+.calendar_calendar_day_name {
+  width: 14.25%;
+  display: inline-block;
+  text-align: center; }
+
+.calendar_calendar_day_number, .calendar_calendar_day_number_selected, .calendar_calendar_year_text, .calendar_calendar_year_text_selected, .calendar_calendar_month_text, .calendar_calendar_month_text_selected {
+  width: 14.25%;
+  display: inline-block;
+  text-align: center;
+  padding: 10px;
+  cursor: pointer; }
+  .calendar_calendar_day_number:hover, .calendar_calendar_day_number_selected:hover, .calendar_calendar_year_text:hover, .calendar_calendar_year_text_selected:hover, .calendar_calendar_month_text:hover, .calendar_calendar_month_text_selected:hover {
+    background-color: #5CB6FA; }
+
+.calendar_calendar_day_number_selected {
+  background-color: #5CB6FA; }
+
+.calendar_calendar_year_text, .calendar_calendar_year_text_selected, .calendar_calendar_month_text, .calendar_calendar_month_text_selected {
+  width: 25%; }
+
+.calendar_calendar_year_text_selected {
+  background-color: #5CB6FA; }
+
+.calendar_calendar_month_text, .calendar_calendar_month_text_selected {
+  width: 33.33%; }
+
+.calendar_calendar_month_text_selected {
+  width: 33.33%;
+  background-color: #5CB6FA; }
+
+/*# sourceMappingURL=main.css.map */
