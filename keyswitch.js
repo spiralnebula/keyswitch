@@ -6,20 +6,12 @@ define({
 			"morph",
 			"event_master",
 			"transistor",
-			"shumput"
+			"shumput",
+			"body",
+			"event",
+			"listener",
 		],
 	},
-
-	// this.remake({
-	// 	original : Object,
-	// 	with     : {
-	// 		listener : {
-	// 			"0" : {
-	// 				with : Object
-	// 			}
-	// 		}
-	// 	}
-	// })
 
 	make : function ( define ) {
 
@@ -113,165 +105,18 @@ define({
 	},
 
 	define_state : function ( define ) {
-		var default_value = define.with.option.value || define.with.option.choice[0]
-		return { 
-			show_on        : ( 
-				define.with.input ? 
-					define.with.input.show_on : 
-					false
-			),
-			original_value : default_value,
-			value          : default_value
-		}
+		return this.library.event.define_state( define )
 	},
 
 	define_event : function ( define ) {
-		return [
-			{ 
-				called : "reset"
-			},
-			{
-				called       : "keyswitch select",
-				that_happens : [
-					{ 
-						on : define.body.body,
-						is : [ "click" ]
-					}
-				],
-				only_if : function ( heard ) {
-					return heard.event.target.hasAttribute("data-keyswitch")
-				}
-			}
-		]
+		return this.library.event.define_event( define )
 	},
 
 	define_listener : function ( define ) {
-		
-		var self = this
-		return [
-			{ 
-				for       : "reset",
-				that_does : function ( heard ) {
-					
-					var wrap_node, button_wrap_node, button
-
-					wrap_node        = heard.event.target
-					button_wrap_node = wrap_node.firstChild
-					button           = self.library.morph.index_loop({
-						subject : button_wrap_node.children,
-						into    : { 
-							selected      : "",
-							default_value : ""
-						},
-						else_do : function ( loop ) {
-							if ( loop.indexed.getAttribute("data-value") === heard.state.value ) {
-								loop.into.selected = loop.indexed
-							} 
-
-							if ( loop.indexed.getAttribute("data-value") === heard.state.original_value ) {
-								loop.into.default_value = loop.indexed
-							}
-
-							return loop.into
-						}
-					})
-
-					if ( button.selected !== button.default_value ) {
-						heard.state.value = heard.state.original_value
-						button.selected.setAttribute("class", define.class_name.item )
-						button.default_value.setAttribute("class", define.class_name.item_selected )
-					}
-
-					if ( define.with.input ) {
-						
-						var input_node
-						input_node = wrap_node.lastChild
-
-						if ( define.with.input.show_on === heard.state.original_value ) {
-							input_node.style.display = "block"
-						} else { 
-							input_node.style.display = "none"
-						}
-					}
-					
-					if ( define.shumput ) { 
-						define.shumput.reset()
-					}
-
-					return heard
-				}
-			},
-			{
-				for       : "keyswitch select",
-				that_does : function ( heard ) {
-
-					var option_state, value, button, wrap
-
-					button             = heard.event.target
-					wrap               = button.parentElement
-					option_state       = heard.state
-					value              = button.getAttribute("data-value")
-					option_state.value = value
-					button.setAttribute("class", define.class_name.item_selected )
-					
-					 self.library.morph.index_loop({
-						subject : button.parentElement.children,
-						else_do : function ( loop ) {
-							if ( loop.indexed !== button ) { 
-								loop.indexed.setAttribute("class", define.class_name.item )
-							}
-							return []
-						}
-					})
-
-					if ( define.with.input ) { 
-						
-						var input_wrap_node
-						input_wrap_node = wrap.nextSibling
-
-						if ( button.getAttribute("data-value") === define.with.input.show_on ) {
-
-							input_wrap_node.style.display = "block"
-
-							console.log( input_wrap_node )
-						} else { 
-							input_wrap_node.style.display = "none"
-						}
-					}
-
-					return heard
-				}
-			}
-		]
+		return this.library.listener.define_listener( define )
 	},
 
 	define_body : function ( define ) {
-
-		var default_value, self
-
-		self          = this
-		default_value = define.with.option.value || define.with.option.choice[0]
-		return {
-			"class"            : define.class_name.wrap,
-			"child"            : [
-				{
-					"class" : define.class_name.item_wrap,
-					"child" : this.library.morph.index_loop({
-						subject : define.with.option.choice,
-						else_do : function ( loop ) {
-							return loop.into.concat({
-								"class"          : ( default_value === loop.indexed ? 
-									define.class_name.item_selected :
-									define.class_name.item
-								),
-								"data-value"     : loop.indexed,
-								"data-keyswitch" : "true",
-								"text"           : loop.indexed
-							})
-						}
-					})
-				}
-			]
-		}
+		return this.library.body.define_body( define )
 	}
 })
