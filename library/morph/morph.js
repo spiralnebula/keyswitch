@@ -115,7 +115,8 @@
 			})
 		},
 
-		surject_object : function ( what ) { 
+		surject_object : function ( what ) {
+			
 			var key, value, what_to_remove
 			key   = this.get_the_keys_of_an_object( what.object )
 			value = this.get_the_values_of_an_object( what.object )

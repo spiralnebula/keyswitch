@@ -37,6 +37,7 @@ define({
 			shumput_part.append( keyswitch_body.body )
 			
 		}
+		
 		event_circle   = this.library.event_master.make({
 			events : this.define_event({
 				body : keyswitch_body,

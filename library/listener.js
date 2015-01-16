@@ -16,11 +16,13 @@
 	{
 		define : {
 			allow   : "*",
-			require : [],
+			require : [
+				"morph"
+			],
 		},
 
 		define_listener : function ( define ) {
-			
+
 			var self = this
 			return [
 				{ 
@@ -79,39 +81,68 @@
 					for       : "keyswitch select",
 					that_does : function ( heard ) {
 
-						var option_state, value, button, wrap
-
-						button             = heard.event.target
-						wrap               = button.parentElement
-						option_state       = heard.state
-						value              = button.getAttribute("data-value")
-						option_state.value = value
-						button.setAttribute("class", define.class_name.item_selected )
+						var value, button, wrap
 						
-						 self.library.morph.index_loop({
-							subject : button.parentElement.children,
-							else_do : function ( loop ) {
-								if ( loop.indexed !== button ) { 
-									loop.indexed.setAttribute("class", define.class_name.item )
-								}
-								return []
-							}
-						})
+						button = heard.event.target
+						wrap   = button.parentElement
+						value  = button.getAttribute("data-value")
 
-						if ( define.with.input ) { 
+						if ( define.with.option.multiple_choice ) {
 							
-							var input_wrap_node
-							input_wrap_node = wrap.nextSibling
+							var button_is_selected = button.getAttribute("data-selected")
 
-							if ( button.getAttribute("data-value") === define.with.input.show_on ) {
+							if ( button_is_selected === "true" && heard.state.value.length > 1 ) {
 
-								input_wrap_node.style.display = "block"
+								button.setAttribute("data-selected", "false")
+								button.setAttribute("class", define.class_name.item )
+								heard.state.value = self.library.morph.surject_array({
+									array : heard.state.value,
+									with  : [ value ]
+								})
+							}
 
-								console.log( input_wrap_node )
-							} else { 
-								input_wrap_node.style.display = "none"
+							if ( button_is_selected === "false" ) {
+
+								button.setAttribute("data-selected", "true")
+								button.setAttribute("class", define.class_name.item_selected )
+								heard.state.value = heard.state.value.concat( value )
 							}
 						}
+
+						console.log( heard.state.value )
+						if ( !define.with.option.multiple_choice ) {
+							
+							button.setAttribute("class", define.class_name.item_selected )
+							button.setAttribute("data-selected", "true")
+							
+							self.library.morph.index_loop({
+								subject : button.parentElement.children,
+								else_do : function ( loop ) {
+									if ( loop.indexed !== button ) { 
+										loop.indexed.setAttribute("class", define.class_name.item )
+										button.setAttribute("data-selected", "false")
+									}
+									return []
+								}
+							})
+
+							heard.state.value = value
+						}
+
+						// if ( define.with.input ) { 
+							
+						// 	var input_wrap_node
+						// 	input_wrap_node = wrap.nextSibling
+
+						// 	if ( button.getAttribute("data-value") === define.with.input.show_on ) {
+
+						// 		input_wrap_node.style.display = "block"
+
+						// 		console.log( input_wrap_node )
+						// 	} else { 
+						// 		input_wrap_node.style.display = "none"
+						// 	}
+						// }
 
 						return heard
 					}

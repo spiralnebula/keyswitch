@@ -23,32 +23,41 @@
 
 		define_body : function ( define ) {
 
-			var default_value, self
+			var default_value, self, content
 
 			self          = this
 			default_value = define.with.option.value || define.with.option.choice[0]
+			content       = []
+
+			if ( define.with.label ) { 
+				content = content.concat({
+					"class" : define.class_name.label,
+					"text"  : define.with.label.text					
+				})
+			}
+
+			content = content.concat({
+				"class" : define.class_name.item_wrap,
+				"child" : this.library.morph.index_loop({
+					subject : define.with.option.choice,
+					else_do : function ( loop ) {
+						return loop.into.concat({
+							"class"          : ( default_value === loop.indexed ? 
+								define.class_name.item_selected :
+								define.class_name.item
+							),
+							"data-selected"  : "false",
+							"data-value"     : loop.indexed,
+							"data-keyswitch" : "true",
+							"text"           : loop.indexed
+						})
+					}
+				})
+			})
 
 			return {
 				"class"            : define.class_name.wrap,
-				"child"            : [
-					{
-						"class" : define.class_name.item_wrap,
-						"child" : this.library.morph.index_loop({
-							subject : define.with.option.choice,
-							else_do : function ( loop ) {
-								return loop.into.concat({
-									"class"          : ( default_value === loop.indexed ? 
-										define.class_name.item_selected :
-										define.class_name.item
-									),
-									"data-value"     : loop.indexed,
-									"data-keyswitch" : "true",
-									"text"           : loop.indexed
-								})
-							}
-						})
-					}
-				]
+				"child"            : content
 			}
 		},
 	}

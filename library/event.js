@@ -20,15 +20,20 @@
 		},
 		
 		define_state : function ( define ) {
-			var default_value = define.with.option.value || define.with.option.choice[0]
-			return { 
+
+			var default_value
+			default_value = define.with.option.value || define.with.option.choice[0]
+			if ( define.with.option.multiple_choice && default_value.constructor !== Array ) { 
+				default_value = [ default_value ]
+			}
+			return {
+				original_value : default_value,
+				value          : default_value,
 				show_on        : ( 
 					define.with.input ? 
 						define.with.input.show_on : 
 						false
 				),
-				original_value : default_value,
-				value          : default_value
 			}
 		},
 
