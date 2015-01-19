@@ -91,7 +91,7 @@
 							
 							var button_is_selected = button.getAttribute("data-selected")
 
-							if ( button_is_selected === "true" && heard.state.value.length > 1 ) {
+							if ( button_is_selected === "true" ) {
 
 								button.setAttribute("data-selected", "false")
 								button.setAttribute("class", define.class_name.item )
@@ -109,7 +109,6 @@
 							}
 						}
 
-						console.log( heard.state.value )
 						if ( !define.with.option.multiple_choice ) {
 							
 							button.setAttribute("class", define.class_name.item_selected )

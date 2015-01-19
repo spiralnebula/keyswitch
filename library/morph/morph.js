@@ -45,6 +45,138 @@
 			}
 		},
 
+		surject_array : function ( what ) {
+
+			var self = this
+
+			return this.index_loop_base({
+				subject         : what.array,
+				start_at        : 0,
+				into            : {
+					extracted : [],
+					leftover  : []
+				},
+				if_done  : function ( loop ) {
+
+					if ( what.take === "extracted" ) {
+						return loop.into.extracted
+					}
+					
+					return loop.into.leftover
+				},
+				else_do  : function ( loop ) {
+
+					var index_of_current_value, extracted_array, leftover_array, 
+					current_value, extract_value
+
+					current_value          = self.copy_value({
+						value : loop.subject[loop.start_at]
+					})
+					index_or_current_value = (
+						what.by === "index" ?
+							loop.start_at :
+							current_value
+					)
+					if ( what.by === "index" ) {
+						extract_value = what.with.indexOf( index_or_current_value ) > -1
+					} else { 
+						extract_value = self.index_loop({
+							"subject" : what.with,
+							"into"    : false,
+							"else_do" : function ( what_with_loop ) {
+
+								if ( what_with_loop.into === false ) { 
+									return self.are_these_two_values_the_same({
+										first  : what_with_loop.indexed,
+										second : current_value
+									})
+								}
+
+								return what_with_loop.into
+							}
+						})
+					}
+
+					extracted_array = (
+						extract_value === true ? 
+							loop.into.extracted.concat( current_value ) :
+							self.copy_value({
+								value : loop.into.extracted
+							})
+					)
+					leftover_array  = ( 
+						extract_value === false?
+							loop.into.leftover.concat( current_value ) :
+							self.copy_value({
+								value : loop.into.leftover
+							})
+					)
+
+					return {
+						subject  : loop.subject,
+						start_at : loop.start_at + 1,
+						into     : {
+							extracted : extracted_array,
+							leftover  : leftover_array,
+						},
+						if_done : loop.if_done,
+						else_do : loop.else_do
+					}
+				},
+			})
+		},
+
+		biject_array : function ( biject ) {
+
+			var self, array, into
+			self  = this
+			array = (
+				biject.array.constructor === HTMLCollection ?
+					self.convert_node_list_to_array( biject.array ) :
+					biject.array
+			)
+
+			return this.base_loop({
+				"subject"    : array,
+				"index"      : 0,
+				"into"       : [],
+				"length"     : biject.array.length,
+				is_done_when : function ( base_loop ) {
+					return base_loop.length === base_loop.into.length
+				},
+				if_done      : function ( base_loop ) { 
+					return base_loop.into
+				},
+				else_do      : function ( base_loop ) {
+
+					var value_to_concat
+					
+					if ( biject.with ) { 
+						value_to_concat = biject.with.call({}, {
+							"index"   : base_loop.index,
+							"indexed" : base_loop.subject[base_loop.index]
+						})
+					} else {
+						value_to_concat = base_loop.index
+					}
+
+					value_to_concat = self.copy_value({
+						value : value_to_concat
+					})
+
+					return { 
+						"length"       : base_loop.length,
+						"subject"      : base_loop.subject,
+						"index"        : base_loop.index + 1,
+						"into"         : base_loop.into.concat( value_to_concat ),
+						"if_done"      : base_loop.if_done,
+						"is_done_when" : base_loop.is_done_when,
+						"else_do"      : base_loop.else_do,
+					}
+				}
+			})
+		},
+
 		inject_object : function ( what ) {
 
 			if ( what.with.constructor === Array ) {
@@ -70,49 +202,6 @@
 					}
 				})
 			}
-		},
-
-		surject_array : function ( what ) {
-
-			return this.index_loop_base({
-				subject         : what.array,
-				start_at        : 0,
-				into            : {
-					extracted : [],
-					leftover  : []
-				},
-				if_done  : function ( loop ) {
-
-					if ( what.take === "extracted" ) {
-						return loop.into.extracted
-					}
-					
-					return loop.into.leftover
-				},
-				else_do  : function ( loop ) {
-
-					var index_of_value
-					index_of_value = ( what.by === "index" ? loop.start_at : loop.subject[loop.start_at] )
-					return {
-						subject         : loop.subject,
-						start_at        : loop.start_at + 1,
-						into            : { 
-							extracted : ( 
-								what.with.indexOf( index_of_value ) > -1 ? 
-									loop.into.extracted.concat(loop.subject[loop.start_at]) :
-									loop.into.extracted.slice(0)
-							),
-							leftover  : ( 
-								what.with.indexOf( index_of_value ) < 0 ?
-									loop.into.leftover.concat(loop.subject[loop.start_at]) :
-									loop.into.leftover.slice(0)	
-							)
-						},
-						if_done  : loop.if_done,
-						else_do  : loop.else_do
-					}
-				},
-			})
 		},
 
 		surject_object : function ( what ) {
@@ -246,60 +335,6 @@
 					}
 				}
 			})
-		},
-
-		biject_array : function ( biject ) {
-
-			var self, array, into
-			self  = this
-			array = (
-				biject.array.constructor === HTMLCollection ?
-					self.convert_node_list_to_array( biject.array ) :
-					biject.array
-			)
-
-			// return this.base_loop({
-			// 	"index"   : 0,
-			// 	"length"  : biject.array.length,
-			// 	"subject" : array,
-			// 	"into"    : biject.into.slice(0),
-			// 	"result"  : [],
-			// 	is_done_when : function ( base_loop ) {
-			// 		return ( base_loop.index === key.length )
-			// 	},
-			// 	if_done : function ( base_loop ) { 
-			// 		return 
-			// 	},
-			// 	else_do      : function ( base_loop ) {
-			// 	}
-			// })
-
-			// return this.index_loop_base({
-			// 	"subject"  : [],
-			// 	"start_at" : 0,
-			// 	"into"     : [],
-			// 	if_done  : function (base_loop) {
-			// 		return base_loop.into
-			// 	},
-			// 	else_do : function (base_loop) {
-			// 		return {
-			// 			"subject"  : self.copy({
-			// 				what : base_loop.subject 
-			// 			}),
-			// 			"into"     : base_loop.into.concat(
-			// 				biject.with({
-			// 					"index"   : base_loop.start_at,
-			// 					"indexed" : self.copy({
-			// 						what : base_loop.subject[base_loop.start_at]
-			// 					})
-			// 				})
-			// 			),
-			// 			"start_at" : base_loop.start_at + 1,
-			// 			"if_done"  : base_loop.if_done,
-			// 			"else_do"  : base_loop.else_do
-			// 		}
-			// 	}
-			// })
 		},
 
 		object_loop : function ( loop ) { 
@@ -747,6 +782,80 @@
 						if_done      : loop.if_done,
 						else_do      : loop.else_do,
 					}
+				}
+			})
+		},
+
+		copy_value : function ( copy ) {
+
+			if (
+				!copy.value                       ||
+				copy.value.constructor === String ||
+				copy.value.constructor === Number
+			) {
+				return copy.value
+			}
+
+			if ( copy.value.constructor === Array ) { 
+				return this.copy_array({
+					array : copy.value
+				})
+			}
+
+			if ( copy.value.constructor === Object ) {
+				return this.copy_object({
+					object : copy.value
+				})
+			}
+		},
+
+		copy_object : function ( copy ) {
+			
+			var key, value, self
+
+			self = this
+
+			return this.base_loop({
+				"key"          : this.get_the_keys_of_an_object( copy.object ),
+				"value"        : this.get_the_values_of_an_object( copy.object ),
+				"index"        : 0,
+				"into"         : {},
+				"is_done_when" : function ( loop ) {
+					return loop.index === loop.key.length
+				},
+				"if_done"      : function ( loop ) {
+					return loop.into
+				},
+				"else_do"      : function ( loop ) {
+					var key, value
+					key            = loop.key[loop.index]
+					value          = self.copy_value({
+						value : loop.value[loop.index]
+					})
+					loop.into[key] = value
+					return { 
+						"key"          : loop.key,
+						"value"        : loop.value,
+						"index"        : loop.index + 1,
+						"into"         : loop.into,
+						"is_done_when" : loop.is_done_when,
+						"if_done"      : loop.if_done,
+						"else_do"      : loop.else_do,
+					}
+				},
+			})
+		},
+
+		copy_array : function ( copy ) {
+			var self = this
+			return this.index_loop({
+				subject : copy.array,
+				else_do : function ( loop ) {
+					return loop.into.concat(
+						self.copy_value({
+							value : loop.indexed
+						})
+					)
 				}
 			})
 		},

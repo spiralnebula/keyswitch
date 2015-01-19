@@ -1,42 +1,8 @@
 
 	var module = window.morph
 
-	describe("inject object", function() {
-
-		it("injects an object into an object", function() {
-			expect( module.inject_object({
-				object : { 
-					s : "some",
-					d : "some other"
-				},
-				with : { 
-					c : "another some"
-				}
-			})).toEqual({
-				s : "some",
-				d : "some other",
-				c : "another some"
-			})
-		})
-
-		it("injects an array into an object", function() {
-			expect( module.inject_object({
-				object : { 
-					a : "some",
-					b : "some other"
-				},
-				with : ["a", "b", "c"]
-			})).toEqual({
-				"a" : "some",
-				"b" : "some other",
-				"0" : "a",
-				"1" : "b",
-				"2" : "c"
-			})
-		})
-	})
-
 	describe("inject array", function() {
+		
 		var definition, input
 		definition = { 
 			array : [],
@@ -85,12 +51,7 @@
 		var definition
 		definition = {
 			array : [],
-			with  : [] || {} || function () {},
-			by    : "(removing|extracting)"
-		}
-		definition = {
-			array : [],
-			with  : [] || {} || function () {},
+			with  : [],
 			by    : "(index|value)"
 		}
 
@@ -101,11 +62,11 @@
 			})).toEqual( [1,3] )
 		})
 
-		it("cant remove object members of an array based on value #!", function() {
+		it("cant remove object members of an array based on value", function() {
 			expect(module.surject_array({
 				array : [{ s : 1 }, 2, { d : 2 }, 4],
 				with  : [{ s : 1 }, { d : 2 }]
-			})).not.toEqual([2,4])
+			})).toEqual([2,4])
 		})
 
 		it("removes object members of an array based on index and returns whats left over ", function() {
@@ -116,7 +77,7 @@
 			})).toEqual( [2,4] )
 		})
 
-		it("leftover members of an array which are objects still contain references to the orignal ones #!", function() {
+		it("removes leftover members of an array which are objects and contains no references to the orignal ones", function() {
 			
 			var pass, result
 			pass   = {
@@ -125,7 +86,97 @@
 				by    : "index"
 			}
 			result = module.surject_array(pass)
-			expect(result[0]).toBe(pass.array[0])
+			expect(result[0]).not.toBe(pass.array[0])
+			result[0].s = 2
+			expect( result[0].s ).not.toEqual( pass.array[0].s )
+		})
+	})
+
+	describe("biject array", function() {
+
+		var definition
+		definition = {
+			array : [],
+			with  : undefined || function ( loop ) {}
+		}
+
+		it("bijects with a method that returns every value", function() {
+			expect(module.biject_array({
+				array : [1,2,3,4,5,6],
+				with  : function ( loop ) {
+					console.log( loop )
+					return loop.index+loop.indexed
+				}
+			})).toEqual([1,3,5,7,9,11])
+		})
+
+
+
+		it("bijects array of objects with no reference", function() {
+
+			var object_1, object_2, result
+			object_1 = { s : 2, d : 3 }
+			object_2 = { s : 1, d : 4 }
+			result   = module.biject_array({
+				array : [object_1, object_2, 3, 4],
+				with  : function ( loop ) { 
+					return loop.indexed
+				}
+			})
+
+			expect( result ).toEqual([
+				{ s : 2, d : 3 },
+				{ s : 1, d : 4 },
+				3, 4
+			])
+
+			result[0].s = 3
+			expect( object_1.s ).toEqual( 2 )
+		})
+
+		// it("bijects into another array cleanly", function() {
+		// 	expect(module.biject_array({
+		// 		array : [1,2,3],
+		// 		into  : [4,5,6],
+		// 		with  : function ( loop ) { 
+		// 			return loop.indexed + loop.into.indexed
+		// 		}
+		// 	})).toEqual([5,7,9])
+		// })
+	})
+
+	describe("inject object", function() {
+
+		it("injects an object into an object", function() {
+			expect( module.inject_object({
+				object : { 
+					s : "some",
+					d : "some other"
+				},
+				with : { 
+					c : "another some"
+				}
+			})).toEqual({
+				s : "some",
+				d : "some other",
+				c : "another some"
+			})
+		})
+
+		it("injects an array into an object", function() {
+			expect( module.inject_object({
+				object : { 
+					a : "some",
+					b : "some other"
+				},
+				with : ["a", "b", "c"]
+			})).toEqual({
+				"a" : "some",
+				"b" : "some other",
+				"0" : "a",
+				"1" : "b",
+				"2" : "c"
+			})
 		})
 	})
 
@@ -285,28 +336,6 @@
 			})
 		})
 	})
-
-	// describe("biject array", function() {
-
-	// 	it("bijects with a method that returns every value", function() {
-	// 		expect(module.biject_array({
-	// 			array : [1,2,3,4,5,6],
-	// 			with  : function ( loop ) { 
-	// 				return loop.index+loop.indexed
-	// 			}
-	// 		})).toEqual([1,3,5,7,9,11])
-	// 	})
-
-	// 	it("bijects into another array cleanly", function() {
-	// 		expect(module.biject_array({
-	// 			array : [1,2,3],
-	// 			into  : [4,5,6],
-	// 			with  : function ( loop ) { 
-	// 				return loop.indexed + loop.into.indexed
-	// 			}
-	// 		})).toEqual([5,7,9])
-	// 	})
-	// })
 
 	describe("get object from arrays", function ( ) {
 		it("merges", function() {
@@ -595,7 +624,7 @@
 			})).toBe(true)	
 		})
 
-		it("knows that two arrays are the same", function() {
+		it("knows that two arrays are not the same", function() {
 			expect( module.are_these_two_values_the_same({
 				first  : [1,2,4],
 				second : [1,4]
@@ -764,11 +793,89 @@
 		})
 	})
 
-	// describe("does array contain this value", function() {
-	// 	it("recoginses that it contains a object", function() {
-	// 		expect(module.does_array_contain_this_value({
-	// 			array : [{ some : "s" }, 2, 4, "some", { some : "d" }],
-	// 			value : { some : "s" }
-	// 		})).toBe( true )
-	// 	})
-	// });
+	describe("copy value", function() {
+		
+		var definition
+		definition = { 
+			object : {}
+		}
+
+		it("copies one dimensional string and number object without reference", function() {
+		
+			var result, object
+		
+			object = { 
+				s : 1, 
+				d : "skaduf"
+			}
+			result = module.copy_value({
+				value : object
+			})
+			result.s = 2
+			result.d = "somesome"
+			expect( object ).toEqual({ 
+				s : 1, 
+				d : "skaduf"
+			})
+		})
+
+		it("copies multi dimensional string and number object without reference", function() {
+			
+			var result, object
+		
+			object = { 
+				s : 1, 
+				d : "skaduf",
+				c : { 
+					b    : "2" ,
+					some : "some",
+					l    : {
+						b : 5
+					}
+				}
+			}
+			result = module.copy_value({
+				value : object
+			})
+			console.log( result )
+			result.s     = 5
+			result.d     = 55
+			result.c.b   = "some"
+			result.c.l.b = "3432"
+
+			expect( object ).toEqual({ 
+				s : 1, 
+				d : "skaduf",
+				c : { 
+					b    : "2" ,
+					some : "some",
+					l    : {
+						b : 5
+					}
+				}
+			})
+		})
+
+		it("copies an array of objects without reference", function() {
+			var object_1, array, result
+			object_1 = {
+				"some" : "asda",
+				"another" : {
+					"there" : "sda"
+				}
+			}
+			array    = [object_1, 1, 2, 5]
+			result   = module.copy_value({
+				value : array
+			})
+			result[0].some         = "some name here"
+			result[0].another.some = "some some"
+			expect( object_1 ).toEqual({
+				"some" : "asda",
+				"another" : {
+					"there" : "sda"
+				}
+			})
+		})
+
+	})

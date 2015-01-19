@@ -23,7 +23,7 @@
 
 			var default_value
 			default_value = define.with.option.value || define.with.option.choice[0]
-			if ( define.with.option.multiple_choice && default_value.constructor !== Array ) { 
+			if ( default_value.constructor !== Array ) {
 				default_value = [ default_value ]
 			}
 			return {
